@@ -21,27 +21,27 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
  * @author iyurenko
  * @since 15.03.16.
  */
-//@Configuration
-//@EnableAuthorizationServer
-//public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
-//
-//    @Autowired
-//    private AuthenticationManager authenticationManager;
-//
-//    @Override
-//    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-//        endpoints.authenticationManager(authenticationManager);
+@Configuration
+@EnableAuthorizationServer
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
-//    }
-//    @Override
-//    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-//        clients.inMemory()
-//                .withClient("myClient1")
-//                .secret("dsfsdfewrewr324")
-//                .authorizedGrantTypes("authorization_code", "refresh_token")
-//                .authorities("USER", "ADMIN")
-//                .scopes("read", "write")
-//                .autoApprove(true);
-//    }
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-//}
+    @Override
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        endpoints.authenticationManager(authenticationManager);
+
+    }
+    @Override
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        clients.inMemory()
+                .withClient("myClient1")
+                .secret("dsfsdfewrewr324")
+                .authorizedGrantTypes("authorization_code", "refresh_token", "implicit")
+                .authorities("USER", "ADMIN")
+                .scopes("read", "write")
+                .autoApprove(true);
+    }
+
+}

@@ -22,7 +22,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable().formLogin().loginPage("/login").permitAll().and().authorizeRequests().anyRequest().authenticated();
     }
 
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
