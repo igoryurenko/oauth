@@ -1,20 +1,26 @@
 package com.iyurenko.client.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
@@ -46,6 +52,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private OAuth2ClientContext oauth2ClientContext;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    @Qualifier("oauthAuthenticationSuccessHandler")
+    private AuthenticationSuccessHandler oauthAuthenticationSuccessHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -60,6 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class)
             .formLogin()
                 .loginPage("/login")
+                .defaultSuccessUrl("/login")
+                .loginProcessingUrl("/login/process-login")
                 .and()
             .logout();
 
@@ -90,11 +105,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new OAuth2RestTemplate(facebook().getClient(), oauth2ClientContext);
     }
 
+    @Bean
+    public OAuth2RestTemplate myOauthRestTemplate() {
+        return new OAuth2RestTemplate(my().getClient(), oauth2ClientContext);
+    }
+
     private Filter ssoFilter() {
         CompositeFilter filter = new CompositeFilter();
         List<Filter> filters = new ArrayList<>();
-        filters.add(ssoFilter(facebook().getClient(), facebook().getResource(), "/login/facebook"));
-        filters.add(ssoFilter(my().getClient(), my().getResource(), "/login/my"));
+        filters.add(ssoFilter(facebook().getClient(), facebook().getResource(), OauthServer.FACEBOOK.getUrlPattern()));
+        filters.add(ssoFilter(my().getClient(), my().getResource(), OauthServer.MY_OAUTH.getUrlPattern()));
         filter.setFilters(filters);
         return filter;
     }
@@ -107,10 +127,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UserInfoTokenServices resourceServerTokenServices = new UserInfoTokenServices(resource.getUserInfoUri(), client.getClientId());
 //        resourceServerTokenServices.setRestTemplate(restTemplate);
         filter.setTokenServices(resourceServerTokenServices);
-
-        SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
-        successHandler.setDefaultTargetUrl("/login");
-        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationSuccessHandler(oauthAuthenticationSuccessHandler);
         return filter;
     }
 
@@ -138,5 +155,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         repository.setHeaderName("X-XSRF-TOKEN");
         return repository;
     }
+
+
+
+//    @Bean
+//    public PasswordEncoder passwordEncoder(){
+//        PasswordEncoder encoder = new BCryptPasswordEncoder();
+//        return encoder;
+//    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.eraseCredentials(false).userDetailsService(userDetailsService);
+    }
+
 
 }
