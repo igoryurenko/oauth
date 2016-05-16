@@ -2,6 +2,7 @@ package com.iyurenko.client.dao.repository;
 
 import com.iyurenko.client.dao.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * @author iyurenko

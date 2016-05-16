@@ -1,5 +1,7 @@
-package com.iyurenko.client.config;
+package com.iyurenko.client.config.security;
 
+import com.iyurenko.client.core.ClientResources;
+import com.iyurenko.client.core.OauthServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
@@ -12,8 +14,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
@@ -21,7 +21,6 @@ import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilt
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -63,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/js/**", "/login**", "/webjars/**").permitAll()
+                .antMatchers("/js/**", "/", "/login**","/login/signup", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .csrf()
@@ -72,8 +71,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)
             .addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class)
             .formLogin()
-                .loginPage("/login")
-                .defaultSuccessUrl("/login")
+                .loginPage("/")
+                .defaultSuccessUrl("/", true)
                 .loginProcessingUrl("/login/process-login")
                 .and()
             .logout();

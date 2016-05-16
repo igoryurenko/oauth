@@ -1,4 +1,4 @@
-package com.iyurenko.client.config;
+package com.iyurenko.client.service.impl;
 
 import com.iyurenko.client.dao.repository.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;

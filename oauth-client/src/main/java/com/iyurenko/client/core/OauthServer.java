@@ -1,4 +1,4 @@
-package com.iyurenko.client.config;
+package com.iyurenko.client.core;
 
 import java.util.stream.Stream;
 

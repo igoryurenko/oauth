@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -28,17 +28,16 @@
 
     <br/>
     <br/>
-    <p>OR</p>
-    <br/>
-    <br/>
 
-</div>
-
-<div class="container" ng-show="!home.authenticated">
 
     <form role="form" ng-submit="home.login()">
+
+        <p>OR</p>
+        <br/>
+        <br/>
+
         <div class="form-group">
-            <label for="username">Username:</label>
+            <label for="username">Login:</label>
             <input type="text" class="form-control" id="username" name="username" ng-model="credentials.username"/>
         </div>
         <div class="form-group">
@@ -46,17 +45,56 @@
             <input type="password" class="form-control" id="password" name="password" ng-model="credentials.password"/>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
+
     </form>
 
+
+    <br/>
+    <br/>
+    <p>OR</p>
+    <br/>
+    <br/>
+
+    <h1 class="container"><a ng-click="home.showAndHideSignUp()" href="#">Sign Up</a></h1>
+    <form role="form" ng-submit="home.signup()" ng-show="home.showSignUp">
+        <div class="form-group">
+            <label for="firstName">Name:</label>
+            <input required="true" type="text" class="form-control" id="firstName" name="firstName" ng-model="home.signupObj.firstName"/>
+        </div>
+        <div class="form-group">
+            <label for="surname">Surname:</label>
+            <input required="true"  type="text" class="form-control" id="surname" name="surname" ng-model="home.signupObj.lastName"/>
+        </div>
+
+        <div class="form-group">
+            <label for="login">Login:</label>
+            <input required="true"  type="text" class="form-control" id="login" name="surname" ng-model="home.signupObj.login"/>
+        </div>
+
+        <div class="form-group">
+            <label for="signupPassword">Password:</label>
+            <input required="true" type="password" class="form-control" id="signupPassword" name="signupPassword" ng-model="home.signupObj.password"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+
 </div>
+
+
+
 
 <div class="container" ng-show="home.authenticated">
     Logged in as: <span ng-bind="home.user"></span>
 </div>
+
 <div class="container" ng-show="home.authenticated">
     <div>
         <button ng-click="home.logout()" class="btn btn-primary">Logout</button>
     </div>
 </div>
+
 </body>
 </html>

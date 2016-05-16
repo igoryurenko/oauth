@@ -1,16 +1,23 @@
 var app = angular.module("app", []).controller("home", function($scope, $http, $location) {
     var self = this;
+    self.showSignUp = false;
+
+    self.showAndHideSignUp = function() {
+        self.showSignUp = !self.showSignUp
+    };
 
     self.authenticate = function() {
         $http.get("/user").success(function(data) {
-            if (data.userAuthentication) {
-                self.user = data.userAuthentication.details.name;
-            } else if (data.name) {
-                self.user = data.name;
+            if (data.id != null) {
+                var firstName = data.firstName ?  data.firstName + " " : "";
+                var lastName = data.lastName ? data.lastName : "";
+                self.user = firstName + lastName
+                self.authenticated = true;
             } else {
-                return;
+                self.user = "N/A";
+                self.authenticated = false;
             }
-            self.authenticated = true;
+
         }).error(function() {
             self.user = "N/A";
             self.authenticated = false;
@@ -36,6 +43,24 @@ var app = angular.module("app", []).controller("home", function($scope, $http, $
         self.authenticate();
         }).error(function(data) {
             console.log("Login failed");
+            $location.path("/");
+        });
+
+    };
+
+    self.signup = function() {
+
+        var json = JSON.stringify(self.signupObj);
+
+        $http.post('/login/signup', json, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).success(function(data) {
+            self.authenticate();
+        }).error(function(data) {
+            console.log("Sign up failed");
             $location.path("/");
         });
 

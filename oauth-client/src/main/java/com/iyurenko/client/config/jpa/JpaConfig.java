@@ -1,4 +1,4 @@
-package com.iyurenko.client.config;
+package com.iyurenko.client.config.jpa;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
